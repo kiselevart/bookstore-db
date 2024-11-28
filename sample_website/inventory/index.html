@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Inventory</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Book Inventory</h1>
+    </header>
+
+    <div>
+        <input type="text" id="searchBar" placeholder="Search for books..." onkeyup="searchBooks()" />
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Genre</th>
+                    <th>Publisher</th>
+                    <th>Price</th>
+                    <th>Stock Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+               
+            </tbody>
+        </table>
+        <div id="pagination">
+            <button onclick="prevPage()">Previous</button>
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <script src="js/books.js"></script>
+</body>
+</html>
