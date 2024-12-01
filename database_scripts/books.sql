@@ -2,15 +2,13 @@
 
 -- creating books table
 CREATE TABLE books (
-    book_id SERIAL,              
+    book_id SERIAL PRIMARY KEY,              
     title VARCHAR(255) NOT NULL,          
     author VARCHAR(255) NOT NULL,          
     isbn VARCHAR(13) UNIQUE NOT NULL,    
     genre VARCHAR(100),                   
     publisher VARCHAR(255),               
-    price DECIMAL(10, 2) NOT NULL,
-
-    PRIMARY KEY book_id
+    price DECIMAL(10, 2) NOT NULL
 );
 
 -- sample data for books table
