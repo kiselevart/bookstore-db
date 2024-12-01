@@ -1,3 +1,6 @@
+-- Active: 1731980817378@@localhost@5431@inventorymanagement
+
+-- initialization
 CREATE DATABASE InventoryManagement;
 
 -- creating table with relevant information
@@ -9,7 +12,8 @@ CREATE TABLE Books (
     Genre VARCHAR(100),                   
     Publisher VARCHAR(255),               
     StockLevel INT NOT NULL DEFAULT 0,     
-    RestockThreshold INT NOT NULL DEFAULT 5 
+    RestockThreshold INT NOT NULL DEFAULT 5,
+    Price DECIMAL(10, 2) NOT NULL 
 );
 
 -- sample data
