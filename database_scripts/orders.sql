@@ -1,9 +1,11 @@
+CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled');
+
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES customers(customer_id),
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(50) NOT NULL
+    status order_status DEFAULT 'Pending'
 );
 
 CREATE TABLE order_items (
@@ -15,7 +17,7 @@ CREATE TABLE order_items (
 );
 
 INSERT INTO orders(customer_id, total_amount, status) VALUES
-    (1, 19.98, 'Completed'),
+    (1, 19.98, 'Delivered'),
     (2, 19.98, 'Shipped'),
     (1, 9.99, 'Processing'),
     (2, 12.99, 'Pending');
