@@ -105,7 +105,6 @@ INSERT INTO suppliers (name, contact_info, address) VALUES
     ('BookSupply Co.', 'booksupply@example.com', '123 Paper Street, Booktown'),
     ('GlobalBooks Ltd.', 'globalbooks@example.com', '456 Novel Avenue, ReadCity');
 
--- Sample Data: SupplierBooks
 INSERT INTO supplier_books (supplier_id, book_id, supply_price) VALUES
     (1, 1, 7.50),
     (1, 2, 6.00),

@@ -1,5 +1,4 @@
 CREATE TYPE reservation_status AS ENUM('Pending', 'Approved', 'Rejected');
-DROP TYPE reservation_status;
 
 CREATE TABLE reservations (
     reservation_id SERIAL PRIMARY KEY,
