@@ -1,4 +1,4 @@
--- Active: 1731980817378@@localhost@5431@postgres
+-- Active: 1731980817378@@localhost@5431@bookstore
 CREATE DATABASE bookstore;
 
 CREATE TABLE customers (
@@ -28,7 +28,6 @@ CREATE TABLE suppliers (
     address TEXT
 );
 
--- Relationship: SupplierBooks
 CREATE TABLE supplier_books (
     supplier_id INT REFERENCES suppliers(supplier_id),
     book_id SERIAL REFERENCES books(book_id),
