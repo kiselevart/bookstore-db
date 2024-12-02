@@ -2,36 +2,27 @@
 -- Create table for book stock management
 CREATE TABLE book_inventory (
     inventory_id SERIAL PRIMARY KEY,
-    book_id INT NOT NULL,
+    book_id SERIAL REFERENCES books(book_id),
     stock_level INT NOT NULL DEFAULT 0,  
     restock_threshold INT NOT NULL DEFAULT 5
 );
 
-ALTER TABLE book_inventory
-ADD CONSTRAINT fk_book FOREIGN KEY (book_id) REFERENCES books(book_id);
-
 -- Create table for tracking stock movements 
 CREATE TABLE stock_movements (
     movement_id SERIAL PRIMARY KEY,
-    book_id INT NOT NULL,
+    book_id SERIAL REFERENCES books(book_id),
     movement_type VARCHAR(50) NOT NULL,  
     quantity INT NOT NULL, 
     movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE stock_movements
-ADD CONSTRAINT fk_book FOREIGN KEY (book_id) REFERENCES books(book_id);
-
 -- Create table for restocking orders from suppliers
 CREATE TABLE restock_orders (
     restock_id SERIAL PRIMARY KEY,
-    book_id INT NOT NULL,
+    book_id SERIAL REFERENCES books(book_id),
     quantity INT NOT NULL, 
     restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-ALTER TABLE restock_orders
-ADD CONSTRAINT fk_book FOREIGN KEY (book_id) REFERENCES books(book_id);
 
 -- Sample data for the inventory
 INSERT INTO book_inventory (book_id, stock_level, restock_threshold)
