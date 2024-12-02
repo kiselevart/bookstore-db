@@ -13,3 +13,16 @@ CREATE TABLE order_items (
     quantity INT NOT NULL,
     subtotal DECIMAL(10, 2) NOT NULL
 );
+
+INSERT INTO orders(customer_id, total_amount, status) VALUES
+    (1, 19.98, 'Completed'),
+    (2, 19.98, 'Shipped'),
+    (1, 9.99, 'Processing'),
+    (2, 12.99, 'Pending');
+
+INSERT INTO order_items (order_id, book_id, quantity, subtotal) VALUES
+    (1, 1, 2, 19.98),
+    (2, 1, 1, 9.99),
+    (2, 5, 1, 9.99),
+    (3, 5, 1, 9.99),
+    (4, 3, 1, 12.99);
