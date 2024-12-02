@@ -33,19 +33,21 @@ const books = [
 
 const rowsPerPage = 10;
 let currentPage = 1;
+let filteredInventory = books;
 
 function loadTableData(page = 1) {
     const tableBody = document.getElementById("tableBody");
-    tableBody.innerHTML = ""; 
+    tableBody.innerHTML = "";
+
     const startIndex = (page - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    const paginatedBooks = books.slice(startIndex, endIndex);
+    const paginatedItems = filteredInventory.slice(startIndex, endIndex);
 
-    paginatedBooks.forEach(book => {
+    paginatedItems.forEach(item => {
         const row = document.createElement("tr");
-        for (const key in book) {
+        for (const key in item) {
             const cell = document.createElement("td");
-            cell.textContent = book[key];
+            cell.textContent = item[key];
             row.appendChild(cell);
         }
         tableBody.appendChild(row);
@@ -56,8 +58,8 @@ function loadTableData(page = 1) {
 
 function updatePagination() {
     const pagination = document.getElementById("pagination");
-    pagination.innerHTML = ""; 
-    const totalPages = Math.ceil(books.length / rowsPerPage);
+    pagination.innerHTML = "";
+    const totalPages = Math.ceil(filteredInventory.length / rowsPerPage);
 
     for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement("button");
@@ -73,46 +75,16 @@ function updatePagination() {
 
 function filterTable() {
     const searchValue = document.getElementById("searchBar").value.toLowerCase();
-    const filteredBooks = books.filter(book =>
-        Object.values(book).some(value =>
+    filteredInventory = books.filter(item =>
+        Object.values(item).some(value =>
             value.toLowerCase().includes(searchValue)
         )
     );
 
     currentPage = 1; 
-    const tableBody = document.getElementById("tableBody");
-    tableBody.innerHTML = ""; 
-
-    filteredBooks.slice(0, rowsPerPage).forEach(book => {
-        const row = document.createElement("tr");
-        for (const key in book) {
-            const cell = document.createElement("td");
-            cell.textContent = book[key];
-            row.appendChild(cell);
-        }
-        tableBody.appendChild(row);
-    });
-
-    updatePaginationForFiltered(filteredBooks.length);
-}
-
-function updatePaginationForFiltered(filteredCount) {
-    const pagination = document.getElementById("pagination");
-    pagination.innerHTML = ""; 
-    const totalPages = Math.ceil(filteredCount / rowsPerPage);
-
-    for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement("button");
-        button.textContent = i;
-        button.className = i === currentPage ? "active" : "";
-        button.onclick = () => {
-            currentPage = i;
-            loadTableData(currentPage);
-        };
-        pagination.appendChild(button);
-    }
+    loadTableData(currentPage);  
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadTableData(currentPage);
+    loadTableData(currentPage); 
 });

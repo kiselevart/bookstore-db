@@ -36,36 +36,56 @@ const customers = [
 ];
 
 const rowsPerPage = 10;
+let currentPage = 1;
+let filteredCustomers = customers; 
 
 function loadTableData(page = 1) {
     const tableBody = document.getElementById("customerTableBody");
-    const moreResultsNote = document.getElementById("moreResultsNote");
     tableBody.innerHTML = "";  
-    moreResultsNote.innerHTML = ""; 
 
-    
-    const sortedCustomers = customers;  
-
-   
-    if (sortedCustomers.length > 10) {
-        moreResultsNote.innerHTML = "<strong>There are more results below.</strong>";
-    }
-
-    
     const startIndex = (page - 1) * rowsPerPage;
-    const paginatedCustomers = sortedCustomers.slice(startIndex, startIndex + rowsPerPage);
-    
+    const paginatedCustomers = filteredCustomers.slice(startIndex, startIndex + rowsPerPage);
+
     paginatedCustomers.forEach(customer => {
         const row = document.createElement("tr");
-        Object.values(customer).forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
+        row.innerHTML = `
+            <td>${customer.firstName}</td>
+            <td>${customer.lastName}</td>
+            <td>${customer.email}</td>
+            <td>${customer.phoneNumber}</td>
+            <td>${customer.address}</td>
+            <td>${customer.membershipStatus}</td>
+        `;
         tableBody.appendChild(row);
     });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadTableData(1); 
-});
+function searchCustomers() {
+    const searchTerm = document.getElementById("searchBar").value.toLowerCase();
+    filteredCustomers = customers.filter(customer =>
+        customer.firstName.toLowerCase().includes(searchTerm) ||
+        customer.lastName.toLowerCase().includes(searchTerm) ||
+        customer.email.toLowerCase().includes(searchTerm) ||
+        customer.phoneNumber.includes(searchTerm) ||
+        customer.address.toLowerCase().includes(searchTerm) ||
+        customer.membershipStatus.toLowerCase().includes(searchTerm)
+    );
+    currentPage = 1; 
+    loadTableData(currentPage);
+}
+
+function nextPage() {
+    if ((currentPage * rowsPerPage) < filteredCustomers.length) {
+        currentPage++;
+        loadTableData(currentPage);
+    }
+}
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        loadTableData(currentPage);
+    }
+}
+
+loadTableData();
