@@ -1,5 +1,6 @@
 -- Active: 1731980817378@@localhost@5431@bookstore
-CREATE DATABASE bookstore;
+
+CREATE DATABASE IF NOT EXISTS bookstore;
 
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
@@ -87,6 +88,42 @@ CREATE TABLE reservations (
     status reservation_status DEFAULT 'Pending'
 );
 
+CREATE TABLE sales (
+    sale_id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES customers(customer_id),
+    sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(50),
+    status VARCHAR(50) DEFAULT 'Pending'
+);
+
+CREATE TABLE sales_analytics (
+    analytics_id SERIAL PRIMARY KEY,
+    date DATE NOT NULL,
+    total_sales DECIMAL(10, 2) NOT NULL,
+    total_transactions INT NOT NULL,
+    average_sale_amount DECIMAL(10, 2) NOT NULL,
+    sales_by_credit_card DECIMAL(10, 2) NOT NULL,
+    sales_by_cash DECIMAL(10, 2) NOT NULL
+);
+
+CREATE OR REPLACE PROCEDURE create_analytics(p_days INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO sales_analytics (date, total_sales, total_transactions, average_sale_amount, sales_by_credit_card, sales_by_cash)
+    SELECT CURRENT_DATE, 
+           COALESCE(SUM(total_amount), 0), 
+           COALESCE(COUNT(sale_id), 0), 
+           COALESCE(AVG(total_amount), 0), 
+           COALESCE(SUM(CASE WHEN payment_method = 'Credit Card' THEN total_amount ELSE 0 END), 0), 
+           COALESCE(SUM(CASE WHEN payment_method = 'Cash' THEN total_amount ELSE 0 END), 0)
+    FROM sales
+    WHERE sale_date >= CURRENT_DATE - (p_days * INTERVAL '1 day');
+END;
+$$;
+
+CALL create_analytics(7);
 
 -- DATA INSERTION
 INSERT INTO customers (first_name, last_name, email, phone_number, address, membership_status) VALUES
@@ -150,3 +187,11 @@ INSERT INTO order_items (order_id, book_id, quantity, subtotal) VALUES
 INSERT INTO reservations(customer_id, book_id) VALUES
     (1, 2),
     (2, 2);
+
+INSERT INTO sales (customer_id, total_amount, payment_method, status)
+VALUES
+    (1, 25.50, 'Credit Card', 'Completed'),
+    (2, 10.00, 'Cash', 'Pending'),
+    (1, 15.75, 'Credit Card', 'Completed'),
+    (2, 32.00, 'Cash', 'Completed'),
+    (1, 40.00, 'Credit Card', 'Cancelled')

@@ -1,4 +1,6 @@
+-- Active: 1731980817378@@localhost@5431@postgres
 -- CAREFUL! 
+REVOKE CONNECT ON DATABASE bookstore FROM PUBLIC;
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
 WHERE pg_stat_activity.datname = 'bookstore'
