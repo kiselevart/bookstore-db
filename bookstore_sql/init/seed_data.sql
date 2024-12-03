@@ -36,11 +36,17 @@ VALUES
     (3, 'Return', 2),
     (4, 'Sale', 1),
     (5, 'Restock', 5),
-    (6, 'Adjustment', -3),
-    (7, 'Restock', 8),
-    (8, 'Sale', 3),
-    (9, 'Sale', 2),
-    (9, 'Restock', 4);
+    (1, 'Adjustment', -3), 
+    (2, 'Restock', 8),
+    (3, 'Sale', 3),        
+    (4, 'Sale', 2),       
+    (5, 'Restock', 4);      
+
+INSERT INTO restock_orders (book_id, quantity)
+VALUES
+    (1, 10),
+    (2, 5), 
+    (3, 8); 
 
 INSERT INTO orders(customer_id, total_amount, status, shipping_address) 
 VALUES

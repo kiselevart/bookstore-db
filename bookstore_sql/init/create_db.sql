@@ -1,4 +1,4 @@
-CREATE DATABASE bookstore;
+-- Active: 1731980817378@@localhost@5431@bookstore
 CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned');
 CREATE TYPE sale_status AS ENUM('Pending', 'Processing', 'Completed', 'Cancelled');
 CREATE TYPE reservation_status AS ENUM('Pending', 'Approved', 'Rejected');
@@ -44,6 +44,13 @@ CREATE TABLE stock_movements (
     movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE restock_orders (
+    restock_id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
+    quantity INT NOT NULL,
+    restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE orders (
