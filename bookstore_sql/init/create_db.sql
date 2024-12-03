@@ -1,3 +1,4 @@
+CREATE DATABASE bookstore;
 CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned');
 CREATE TYPE sale_status AS ENUM('Pending', 'Processing', 'Completed', 'Cancelled');
 CREATE TYPE reservation_status AS ENUM('Pending', 'Approved', 'Rejected');

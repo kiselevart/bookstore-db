@@ -1,9 +1,9 @@
-INSERT INTO customers (first_name, last_name, email, phone_number, address, membership_status) VALUES
-    ('Alice', 'Johnson', 'alice@example.com', '123-456-7890', '789 Reader Lane, Booktown', 'Gold'),
-    ('Bob', 'Smith', 'bob@example.com', '987-654-3210', '321 Library Blvd, NovelCity', 'Silver'),
-    ('Charlie', 'Davis', 'charlie.davis@example.com', '555-0101-2345', '456 Novel Ave, Booktown', 'Bronze'),
-    ('David', 'Evans', 'david.evans@example.com', '555-0202-3456', '987 Story Rd, Readsville', 'Gold'),
-    ('Emma', 'Wilson', 'emma.wilson@example.com', '555-0303-4567', '123 Page St, StoryCity', 'Platinum');
+INSERT INTO customers (first_name, last_name, email, address, membership_status) VALUES
+    ('Alice', 'Johnson', 'alice@example.com',  '789 Reader Lane, Booktown', 'Gold'),
+    ('Bob', 'Smith', 'bob@example.com', '321 Library Blvd, NovelCity', 'Silver'),
+    ('Charlie', 'Davis', 'charlie.davis@example.com', '456 Novel Ave, Booktown', 'Bronze'),
+    ('David', 'Evans', 'david.evans@example.com', '987 Story Rd, Readsville', 'Gold'),
+    ('Emma', 'Wilson', 'emma.wilson@example.com', '123 Page St, StoryCity', 'Platinum');
 
 INSERT INTO books (title, author, isbn, genre, publisher, price)
 VALUES
@@ -42,18 +42,6 @@ VALUES
     (9, 'Sale', 2),
     (9, 'Restock', 4);
 
-INSERT INTO restock_orders (book_id, quantity)
-VALUES
-    (1, 10),
-    (2, 5),
-    (3, 10),
-    (4, 6),
-    (5, 8),
-    (6, 15),
-    (7, 8),
-    (8, 6),
-    (9, 12);
-
 INSERT INTO orders(customer_id, total_amount, status, shipping_address) 
 VALUES
     (1, 19.98, 'Delivered', '789 Reader Lane, Booktown'),
@@ -76,15 +64,15 @@ VALUES
     (7, 9, 2, 27.98),
     (8, 2, 2, 17.98);
 
-INSERT INTO sales (customer_id, total_amount, payment_method, status)
+INSERT INTO sales (order_id, total_amount, payment_method, status)
 VALUES
     (1, 25.50, 'Credit Card', 'Completed'),
     (2, 10.00, 'Cash', 'Pending'),
-    (1, 15.75, 'Credit Card', 'Completed'),
-    (2, 32.00, 'Cash', 'Completed'),
-    (1, 40.00, 'Credit Card', 'Cancelled'),
-    (5, 45.98, 'Credit Card', 'Completed'),
-    (4, 50.00, 'Debit Card', 'Completed');
+    (3, 15.75, 'Credit Card', 'Completed'),
+    (4, 32.00, 'Cash', 'Completed'),
+    (5, 40.00, 'Credit Card', 'Cancelled'),
+    (6, 45.98, 'Credit Card', 'Completed'),
+    (7, 50.00, 'Debit Card', 'Completed');
 
 INSERT INTO reservations (customer_id, book_id, status, expiry_date, pickup_date)
 VALUES
@@ -93,4 +81,3 @@ VALUES
     (3, 4, 'Approved', '2024-12-12', '2024-12-08'),
     (4, 3, 'Rejected', '2024-12-20', NULL),
     (5, 7, 'Approved', '2024-12-18', '2024-12-10');
-
