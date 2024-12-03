@@ -50,12 +50,12 @@ VALUES
 
 INSERT INTO orders(customer_id, total_amount, status, shipping_address) 
 VALUES
-    (1, 19.98, 'Delivered', '789 Reader Lane, Booktown'),
-    (2, 19.98, 'Shipped', '321 Library Blvd, NovelCity'),
+    (1, 19.98, 'Completed', '789 Reader Lane, Booktown'),
+    (2, 19.98, 'Pending', '321 Library Blvd, NovelCity'),
     (1, 9.99, 'Processing', '789 Reader Lane, Booktown'),
     (2, 12.99, 'Pending', '321 Library Blvd, NovelCity'),
-    (3, 25.98, 'Delivered', '456 Novel Ave, Booktown'),
-    (4, 40.00, 'Shipped', '987 Story Rd, Readsville'),
+    (3, 25.98, 'Completed', '456 Novel Ave, Booktown'),
+    (4, 40.00, 'Cancelled', '987 Story Rd, Readsville'),
     (5, 45.98, 'Cancelled', '123 Page St, StoryCity');
 
 INSERT INTO order_items (order_id, book_id, quantity, subtotal) 
@@ -65,10 +65,7 @@ VALUES
     (2, 5, 1, 9.99),
     (3, 5, 1, 9.99),
     (4, 3, 1, 12.99),
-    (5, 6, 3, 23.97),
-    (6, 8, 1, 13.99),
-    (7, 9, 2, 27.98),
-    (8, 2, 2, 17.98);
+    (5, 6, 3, 23.97)
 
 INSERT INTO sales (order_id, total_amount, payment_method, status)
 VALUES

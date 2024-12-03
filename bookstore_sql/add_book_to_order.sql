@@ -50,11 +50,6 @@ BEGIN
     INSERT INTO order_items (order_id, book_id, quantity, subtotal)
     VALUES (v_order_id, p_book_id, p_quantity, v_subtotal);
 
-    UPDATE book_inventory
-    SET stock_level = stock_level - p_quantity,
-        updated_at = NOW() 
-    WHERE book_id = p_book_id;
-
     UPDATE orders
     SET total_amount = total_amount + v_subtotal,
         updated_at = NOW()  

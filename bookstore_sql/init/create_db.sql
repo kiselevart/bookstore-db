@@ -1,9 +1,17 @@
 -- Active: 1731980817378@@localhost@5431@bookstore
-CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned');
+DROP TYPE IF EXISTS order_status CASCADE;
+CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Completed', 'Cancelled');
+
+DROP TYPE IF EXISTS sale_status CASCADE;
 CREATE TYPE sale_status AS ENUM('Pending', 'Processing', 'Completed', 'Cancelled');
+
+DROP TYPE IF EXISTS reservation_status CASCADE;
 CREATE TYPE reservation_status AS ENUM('Pending', 'Approved', 'Rejected');
+
+DROP TYPE IF EXISTS movement_type CASCADE;
 CREATE TYPE movement_type AS ENUM ('Restock', 'Sale', 'Return', 'Adjustment');
 
+DROP TABLE IF EXISTS customers CASCADE;
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
@@ -15,6 +23,7 @@ CREATE TABLE customers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS books CASCADE;
 CREATE TABLE books (
     book_id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -27,6 +36,7 @@ CREATE TABLE books (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS book_inventory CASCADE;
 CREATE TABLE book_inventory (
     inventory_id SERIAL PRIMARY KEY,
     book_id INT REFERENCES books(book_id),
@@ -36,6 +46,7 @@ CREATE TABLE book_inventory (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS stock_movements CASCADE;
 CREATE TABLE stock_movements (
     movement_id SERIAL PRIMARY KEY,
     book_id INT REFERENCES books(book_id),
@@ -46,6 +57,7 @@ CREATE TABLE stock_movements (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS restock_orders CASCADE;
 CREATE TABLE restock_orders (
     restock_id SERIAL PRIMARY KEY,
     book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
@@ -53,6 +65,7 @@ CREATE TABLE restock_orders (
     restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS orders CASCADE;
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES customers(customer_id) ON DELETE CASCADE,
@@ -64,6 +77,7 @@ CREATE TABLE orders (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS order_items CASCADE;
 CREATE TABLE order_items (
     order_item_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(order_id) ON DELETE CASCADE,
@@ -74,6 +88,7 @@ CREATE TABLE order_items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS sales CASCADE;
 CREATE TABLE sales (
     sale_id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(order_id) ON DELETE CASCADE,
@@ -85,6 +100,7 @@ CREATE TABLE sales (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS reservations CASCADE;
 CREATE TABLE reservations (
     reservation_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES customers(customer_id) ON DELETE CASCADE,
