@@ -219,15 +219,6 @@ EXECUTE FUNCTION update_order_status_on_sale_completed();
 -- SELECT * FROM sales;
 -- UPDATE sales SET status = 'Completed' WHERE sale_id = 2;
 
-CREATE TABLE IF NOT EXISTS restock_notices (
-    notice_id SERIAL PRIMARY KEY,
-    book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
-    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
-    stock_level INT NOT NULL,
-    restock_threshold INT NOT NULL,
-    notice_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE OR REPLACE FUNCTION notify_low_stock()
 RETURNS TRIGGER AS
 $$
@@ -244,12 +235,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to fire after an update on book_inventory table
 CREATE TRIGGER trigger_notify_low_stock
 AFTER UPDATE ON book_inventory
 FOR EACH ROW
 EXECUTE FUNCTION notify_low_stock();
 
-
-SELECT * FROM book_inventory;
-UPDATE book_inventory SET stock_level = 2 WHERE inventory_id = 1;
+-- SELECT * FROM book_inventory;
+-- UPDATE book_inventory SET stock_level = 2 WHERE inventory_id = 1;
