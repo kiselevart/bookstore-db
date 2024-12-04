@@ -139,7 +139,6 @@ CREATE OR REPLACE FUNCTION enforce_minimum_stock_level()
 RETURNS TRIGGER AS
 $$
 BEGIN
-    -- Check if the new stock level is below the restock threshold for the book
     IF NEW.stock_level < NEW.restock_threshold THEN
         RAISE EXCEPTION 'Stock level for book_id % is below the minimum threshold of %!', 
             NEW.book_id, NEW.restock_threshold;
@@ -152,3 +151,46 @@ CREATE TRIGGER trigger_enforce_minimum_stock_level
 BEFORE UPDATE ON book_inventory
 FOR EACH ROW
 EXECUTE FUNCTION enforce_minimum_stock_level();
+
+CREATE OR REPLACE FUNCTION update_stock_after_restock()
+RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE book_inventory
+    SET stock_level = stock_level + NEW.quantity,
+        updated_at = NOW()
+    WHERE book_id = NEW.book_id AND store_id = NEW.store_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_stock_after_restock
+AFTER INSERT ON restock_orders
+FOR EACH ROW
+EXECUTE FUNCTION update_stock_after_restock();
+
+CREATE OR REPLACE FUNCTION log_stock_movement()
+RETURNS TRIGGER AS
+$$
+BEGIN
+    INSERT INTO stock_movements (book_id, store_id, movement_type, quantity, movement_date)
+    VALUES (NEW.book_id, NEW.store_id, 
+            CASE 
+                WHEN TG_OP = 'INSERT' THEN 'Restock'::movement_type  
+                WHEN TG_OP = 'UPDATE' AND NEW.stock_level < OLD.stock_level THEN 'Sale'::movement_type   
+                WHEN TG_OP = 'UPDATE' AND NEW.stock_level > OLD.stock_level THEN 'Restock'::movement_type
+                ELSE 'Adjustment'::movement_type
+            END,
+            ABS(NEW.stock_level - OLD.stock_level), CURRENT_TIMESTAMP);
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trigger_log_stock_movement
+AFTER INSERT OR UPDATE ON book_inventory
+FOR EACH ROW
+EXECUTE FUNCTION log_stock_movement();
+
+SELECT * FROM stock_movements;
+UPDATE book_inventory SET stock_level = 10 WHERE inventory_id = 1;
