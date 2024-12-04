@@ -10,6 +10,17 @@ CREATE TYPE reservation_status AS ENUM('Pending', 'Approved', 'Rejected');
 DROP TYPE IF EXISTS movement_type CASCADE;
 CREATE TYPE movement_type AS ENUM ('Restock', 'Sale', 'Return', 'Adjustment');
 
+DROP TABLE IF EXISTS stores CASCADE;
+CREATE TABLE stores (
+    store_id SERIAL PRIMARY KEY,
+    store_name VARCHAR(255) NOT NULL,
+    store_location VARCHAR(255),
+    contact_number VARCHAR(50),
+    email VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 DROP TABLE IF EXISTS customers CASCADE;
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
@@ -31,24 +42,24 @@ CREATE TABLE books (
     genre VARCHAR(100),
     publisher VARCHAR(255),
     price DECIMAL(10, 2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS book_inventory CASCADE;
 CREATE TABLE book_inventory (
     inventory_id SERIAL PRIMARY KEY,
-    book_id INT REFERENCES books(book_id),
+    book_id INT REFERENCES books(book_id) ON DELETE CASCADE, 
+    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
     stock_level INT NOT NULL DEFAULT 0,
     restock_threshold INT NOT NULL DEFAULT 5,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS stock_movements CASCADE;
 CREATE TABLE stock_movements (
     movement_id SERIAL PRIMARY KEY,
-    book_id INT REFERENCES books(book_id),
+    book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
+    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
     movement_type movement_type NOT NULL,
     quantity INT NOT NULL,
     movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -60,6 +71,7 @@ DROP TABLE IF EXISTS restock_orders CASCADE;
 CREATE TABLE restock_orders (
     restock_id SERIAL PRIMARY KEY,
     book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
+    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
     quantity INT NOT NULL,
     restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -68,6 +80,7 @@ DROP TABLE IF EXISTS orders CASCADE;
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES customers(customer_id) ON DELETE CASCADE,
+    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL,
     status order_status DEFAULT 'Pending', 
@@ -104,6 +117,7 @@ CREATE TABLE reservations (
     reservation_id SERIAL PRIMARY KEY,
     customer_id INT REFERENCES customers(customer_id) ON DELETE CASCADE,
     book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
+    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
     reservation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status reservation_status DEFAULT 'Pending',
     expiry_date TIMESTAMP, 
@@ -111,6 +125,12 @@ CREATE TABLE reservations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO stores (store_name, store_location, contact_number, email)
+VALUES
+    ('Store A', 'New York, NY', '123-456-7890', 'storea@example.com'),
+    ('Store B', 'Los Angeles, CA', '234-567-8901', 'storeb@example.com'),
+    ('Store C', 'Chicago, IL', '345-678-9012', 'storec@example.com');
 
 INSERT INTO customers (first_name, last_name, email, address, membership_status) VALUES
     ('Alice', 'Johnson', 'alice@example.com',  '789 Reader Lane, Booktown', 'Gold'),
@@ -131,30 +151,34 @@ VALUES
     ('Moby Dick', 'Herman Melville', '9781503280786', 'Adventure', 'CreateSpace Independent Publishing Platform', 13.99),
     ('War and Peace', 'Leo Tolstoy', '9781853260629', 'Historical', 'Wordsworth Editions', 14.99);
 
-INSERT INTO book_inventory (book_id, stock_level, restock_threshold)
+INSERT INTO book_inventory (book_id, store_id, stock_level, restock_threshold)
 VALUES
-    (1, 15, 5),
-    (2, 8, 5),
-    (3, 5, 3),
-    (4, 10, 6),
-    (5, 3, 4),
-    (6, 20, 5),
-    (7, 12, 5),
-    (8, 7, 4),
-    (9, 10, 6);
+    (1, 1, 15, 5),
+    (2, 1, 8, 5),
+    (3, 1, 5, 3),
+    (4, 1, 10, 6),
+    (5, 1, 3, 4),
+    (6, 1, 20, 5),
+    (7, 1, 12, 5),
+    (8, 1, 7, 4),
+    (9, 1, 10, 6),
+    (1, 2, 10, 5),
+    (1, 3, 10, 5);
 
-INSERT INTO stock_movements (book_id, movement_type, quantity)
+INSERT INTO stock_movements (book_id, store_id, movement_type, quantity)
 VALUES
-    (1, 'Sale', 2),
-    (2, 'Sale', 1),
-    (3, 'Return', 2),
-    (4, 'Sale', 1),
-    (5, 'Restock', 5),
-    (1, 'Adjustment', -3), 
-    (2, 'Restock', 8),
-    (3, 'Sale', 3),        
-    (4, 'Sale', 2),       
-    (5, 'Restock', 4);      
+    (1, 1, 'Sale', 2),
+    (2, 1, 'Sale', 1),
+    (3, 1, 'Return', 2),
+    (4, 1, 'Sale', 1),
+    (5, 1, 'Restock', 5),
+    (1, 1, 'Adjustment', -3), 
+    (2, 1, 'Restock', 8),
+    (3, 1, 'Sale', 3),        
+    (4, 1, 'Sale', 2),       
+    (5, 1, 'Restock', 4),      
+    (1, 2, 'Restock', 10),
+    (1, 3, 'Restock', 10);
 
 INSERT INTO restock_orders (book_id, quantity)
 VALUES
@@ -162,15 +186,15 @@ VALUES
     (2, 5), 
     (3, 8); 
 
-INSERT INTO orders(customer_id, total_amount, status, shipping_address) 
+INSERT INTO orders(customer_id, store_id, total_amount, status, shipping_address) 
 VALUES
-    (1, 19.98, 'Completed', '789 Reader Lane, Booktown'),
-    (2, 19.98, 'Pending', '321 Library Blvd, NovelCity'),
-    (1, 9.99, 'Processing', '789 Reader Lane, Booktown'),
-    (2, 12.99, 'Pending', '321 Library Blvd, NovelCity'),
-    (3, 25.98, 'Completed', '456 Novel Ave, Booktown'),
-    (4, 40.00, 'Cancelled', '987 Story Rd, Readsville'),
-    (5, 45.98, 'Cancelled', '123 Page St, StoryCity');
+    (1, 1, 19.98, 'Completed', '789 Reader Lane, Booktown'),
+    (2, 1,19.98, 'Pending', '321 Library Blvd, NovelCity'),
+    (1, 1, 9.99, 'Processing', '789 Reader Lane, Booktown'),
+    (2, 1, 12.99, 'Pending', '321 Library Blvd, NovelCity'),
+    (3, 1, 25.98, 'Completed', '456 Novel Ave, Booktown'),
+    (4, 1, 40.00, 'Cancelled', '987 Story Rd, Readsville'),
+    (5, 1, 45.98, 'Cancelled', '123 Page St, StoryCity');
 
 INSERT INTO order_items (order_id, book_id, quantity, subtotal) 
 VALUES
@@ -181,7 +205,7 @@ VALUES
     (4, 3, 1, 12.99),
     (5, 6, 3, 23.97)
 
-INSERT INTO sales (order_id, total_amount, payment_method, status)
+INSERT INTO sales (order_id, store_id, total_amount, payment_method, status)
 VALUES
     (1, 25.50, 'Credit Card', 'Completed'),
     (2, 10.00, 'Cash', 'Pending'),
@@ -191,10 +215,10 @@ VALUES
     (6, 45.98, 'Credit Card', 'Completed'),
     (7, 50.00, 'Debit Card', 'Completed');
 
-INSERT INTO reservations (customer_id, book_id, status, expiry_date, pickup_date)
+INSERT INTO reservations (customer_id, store_id, book_id, status, expiry_date, pickup_date)
 VALUES
-    (1, 2, 'Approved', '2024-12-15', '2024-12-10'),
-    (2, 2, 'Pending', '2024-12-15', NULL),
-    (3, 4, 'Approved', '2024-12-12', '2024-12-08'),
-    (4, 3, 'Rejected', '2024-12-20', NULL),
-    (5, 7, 'Approved', '2024-12-18', '2024-12-10');
+    (1, 1, 2, 'Approved', '2024-12-15', '2024-12-10'),
+    (2, 1, 2, 'Pending', '2024-12-15', NULL),
+    (3, 1, 4, 'Approved', '2024-12-12', '2024-12-08'),
+    (4, 1, 3, 'Rejected', '2024-12-20', NULL),
+    (5, 1, 7, 'Approved', '2024-12-18', '2024-12-10');
