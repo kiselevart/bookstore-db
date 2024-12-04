@@ -1,5 +1,5 @@
 DROP TYPE IF EXISTS order_status CASCADE;
-CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Completed', 'Cancelled');
+CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Completed', 'Cancelled');
 
 DROP TYPE IF EXISTS sale_status CASCADE;
 CREATE TYPE sale_status AS ENUM('Pending', 'Processing', 'Completed', 'Cancelled');
@@ -74,6 +74,16 @@ CREATE TABLE restock_orders (
     store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
     quantity INT NOT NULL,
     restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS restock_notices CASCADE;
+CREATE TABLE restock_notices (
+    notice_id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
+    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
+    stock_level INT NOT NULL,
+    restock_threshold INT NOT NULL,
+    notice_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS orders CASCADE;
@@ -193,7 +203,7 @@ VALUES
     (1, 1, 9.99, 'Processing', '789 Reader Lane, Booktown'),
     (2, 1, 12.99, 'Pending', '321 Library Blvd, NovelCity'),
     (3, 1, 25.98, 'Completed', '456 Novel Ave, Booktown'),
-    (4, 1, 40.00, 'Cancelled', '987 Story Rd, Readsville'),
+    (4, 1, 40.00, 'Shipped', '987 Story Rd, Readsville'),
     (5, 1, 45.98, 'Cancelled', '123 Page St, StoryCity');
 
 INSERT INTO order_items (order_id, book_id, quantity, subtotal) 
@@ -205,7 +215,7 @@ VALUES
     (4, 3, 1, 12.99),
     (5, 6, 3, 23.97)
 
-INSERT INTO sales (order_id, store_id, total_amount, payment_method, status)
+INSERT INTO sales (order_id, total_amount, payment_method, status)
 VALUES
     (1, 25.50, 'Credit Card', 'Completed'),
     (2, 10.00, 'Cash', 'Pending'),
