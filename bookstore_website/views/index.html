@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Inventory</title>
+    <title>Homepage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -23,35 +23,24 @@
         });
     </script>
 
-    <div class="container mt-4">
-        <input type="text" id="searchBar" class="form-control mb-3" placeholder="Search in inventory..." aria-label="Search inventory">
-
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>ISBN</th>
-                    <th>Genre</th>
-                    <th>Publisher</th>
-                    <th>Price</th>
-                    <th>Stock Quantity</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- Inventory items will be inserted here -->
-            </tbody>
-        </table>
-
-        <div id="pagination" class="mt-3">
-            <!-- Pagination buttons will be inserted here -->
-        </div>
+    <div class="container mt-5">
+        <h1>Welcome to the Readokuniya Homepage!</h1>
+        <p>Navigate using the links in the navbar above.</p>
+        <section class="hero-section">
+            <img src="../icons/readokuniya-full.png" alt="Readokuniya Logo">
+            <p class="mission-statement">
+                At Readokuniya, we want to unite readers all over the world. We offer timeless classics of all genres. Your literary journey begins here!
+            </p>
+        </section>
+        <button id="resetStockBtn">Reset Inventory Stock</button>
     </div>
 
-    <script src="../js/inventory.js"></script>
 
-    <!-- Bootstrap JS and its dependencies (Popper.js and Bootstrap JS) -->
+
+
+    <script src="../js/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+
 </body>
 </html>
