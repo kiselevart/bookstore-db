@@ -1,9 +1,18 @@
 import sys
 import psycopg2
 
-print("Python executable:", sys.executable)
-print("psycopg2 location:", psycopg2.__file__)
-
+def execute_sql_from_file(filename, connection):
+    """Execute SQL statements from a given file."""
+    with open(filename, 'r') as file:
+        sql = file.read()  
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+                connection.commit()  
+                print(f"Executed {filename} successfully.")
+        except Exception as e:
+            print(f"Error executing {filename}: {e}")
+            connection.rollback()
 
 def connect_to_db():
     connection = None
@@ -27,12 +36,13 @@ def connect_to_db():
             cursor.execute("SELECT 'Test query successful!' AS message;")
             print(cursor.fetchone()[0])
 
+        return connection  
+
     except Exception as e:
         print(f"Error: {e}")
-    finally:
-        if connection:
-            connection.close()
-            print("Connection closed")
+        return None  
 
 if __name__ == "__main__":
-    connect_to_db()
+    connection = connect_to_db()
+    if connection:
+        execute_sql_from_file("../bookstore_sql/create_db.sql", connection)
