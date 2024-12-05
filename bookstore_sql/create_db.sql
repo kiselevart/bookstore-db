@@ -4,9 +4,6 @@ CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Completed
 DROP TYPE IF EXISTS sale_status CASCADE;
 CREATE TYPE sale_status AS ENUM('Pending', 'Processing', 'Completed', 'Cancelled');
 
-DROP TYPE IF EXISTS reservation_status CASCADE;
-CREATE TYPE reservation_status AS ENUM('Pending', 'Approved', 'Rejected');
-
 DROP TYPE IF EXISTS movement_type CASCADE;
 CREATE TYPE movement_type AS ENUM ('Restock', 'Sale', 'Return', 'Adjustment');
 
@@ -122,20 +119,6 @@ CREATE TABLE sales (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS reservations CASCADE;
-CREATE TABLE reservations (
-    reservation_id SERIAL PRIMARY KEY,
-    customer_id INT REFERENCES customers(customer_id) ON DELETE CASCADE,
-    book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
-    store_id INT REFERENCES stores(store_id) ON DELETE CASCADE,
-    reservation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status reservation_status DEFAULT 'Pending',
-    expiry_date TIMESTAMP, 
-    pickup_date TIMESTAMP,  
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 INSERT INTO stores (store_name, store_location, contact_number, email)
 VALUES
     ('Store A', 'New York, NY', '123-456-7890', 'storea@example.com'),
@@ -224,11 +207,3 @@ VALUES
     (5, 40.00, 'Credit Card', 'Cancelled'),
     (6, 45.98, 'Credit Card', 'Completed'),
     (7, 50.00, 'Debit Card', 'Completed');
-
-INSERT INTO reservations (customer_id, store_id, book_id, status, expiry_date, pickup_date)
-VALUES
-    (1, 1, 2, 'Approved', '2024-12-15', '2024-12-10'),
-    (2, 1, 2, 'Pending', '2024-12-15', NULL),
-    (3, 1, 4, 'Approved', '2024-12-12', '2024-12-08'),
-    (4, 1, 3, 'Rejected', '2024-12-20', NULL),
-    (5, 1, 7, 'Approved', '2024-12-18', '2024-12-10');
