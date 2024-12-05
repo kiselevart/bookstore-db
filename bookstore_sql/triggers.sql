@@ -28,7 +28,7 @@ RETURNS TRIGGER AS
 $$
 BEGIN
     -- want at least 1 book in stock always
-    IF NEW.stock_level < 2 THEN
+    IF NEW.stock_level <= 1 THEN
         RAISE EXCEPTION 'No more stock for book_id % in store %', 
             NEW.book_id, NEW.restock_threshold;
     END IF;
