@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateQuantity(event) {
         // Get the itemId from the input field
-        const itemId = parseInt(event.target.getAttribute("data-id"));
+        const itemId = event.target.getAttribute("data-id");
         const newQuantity = parseInt(event.target.value);
         
         // Ensure the quantity is valid
