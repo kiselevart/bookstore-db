@@ -81,9 +81,6 @@ AFTER INSERT OR UPDATE ON book_inventory
 FOR EACH ROW
 EXECUTE FUNCTION log_stock_movement();
 
--- SELECT * FROM stock_movements;
--- UPDATE book_inventory SET stock_level = 10 WHERE inventory_id = 1;
-
 CREATE OR REPLACE FUNCTION update_order_status_on_sale_completed()
 RETURNS TRIGGER AS
 $$
@@ -102,10 +99,6 @@ CREATE OR REPLACE TRIGGER trigger_update_order_status_on_sale_completed
 AFTER INSERT OR UPDATE ON sales
 FOR EACH ROW
 EXECUTE FUNCTION update_order_status_on_sale_completed();
-
--- SELECT * FROM orders;
--- SELECT * FROM sales;
--- UPDATE sales SET status = 'Completed' WHERE sale_id = 2;
 
 CREATE OR REPLACE FUNCTION notify_low_stock()
 RETURNS TRIGGER AS
@@ -127,6 +120,3 @@ CREATE OR REPLACE TRIGGER trigger_notify_low_stock
 AFTER UPDATE ON book_inventory
 FOR EACH ROW
 EXECUTE FUNCTION notify_low_stock();
-
--- SELECT * FROM book_inventory;
--- UPDATE book_inventory SET stock_level = 2 WHERE inventory_id = 1;

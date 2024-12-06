@@ -20,6 +20,8 @@ BEGIN
 END;
 $$;
 
+-- SELECT * FROM is_boo_in_stock(1);
+
 -- Checks if there is enough of a book in stock at a store (helper)
 CREATE OR REPLACE FUNCTION check_stock_level(
     p_book_id INT,
@@ -48,6 +50,8 @@ BEGIN
 END;
 $$;
 
+-- SELECT * FROM check_stock_level(1, 1, 5);
+
 -- Calculates the subtotal for a book order (helper)
 CREATE OR REPLACE FUNCTION calculate_subtotal(
     p_book_id INT,
@@ -60,6 +64,8 @@ SELECT price * p_quantity
 FROM books
 WHERE book_id = p_book_id;
 $$;
+
+-- SELECT calculate_subtotal(1, 2);
 
 -- Gets customer's pending order (helper)
 CREATE OR REPLACE FUNCTION get_pending_order(
@@ -76,6 +82,8 @@ WHERE o.customer_id = p_customer_id
   AND o.status IN ('Pending', 'Processing')
 LIMIT 1;
 $$;
+
+-- SELECT * FROM get_pending_order(1, 1);
 
 -- Creates an order for a customer
 CREATE OR REPLACE FUNCTION create_new_order(
@@ -105,6 +113,8 @@ BEGIN
     RETURN v_order_id;
 END;
 $$;
+
+-- SELECT * FROM create_new_order(1, 1, 100);
 
 -- Adds a book to an existing order or creates a new order if one does not exist
 CREATE OR REPLACE PROCEDURE add_book_to_order(
@@ -148,7 +158,8 @@ BEGIN
 END;
 $$;
 
--- CALL add_book_to_order(1, 1, 1, 2);
+-- SELECT * FROM orders WHERE customer_id = 5;
+-- CALL add_book_to_order(5, 1, 2, 1);
 
 -- Changes the status of an order to 'Cancelled' if it hasn't been completed
 CREATE OR REPLACE PROCEDURE cancel_order(
@@ -178,7 +189,9 @@ BEGIN
 
 END;
 $$;
--- CALL cancel_order(2);
+
+-- SELECT * FROM orders;
+-- CALL cancel_order(8);
 
 -- Fetches a list of books with optional filters based on genre and price range
 CREATE OR REPLACE FUNCTION select_books(
@@ -194,7 +207,7 @@ RETURNS TABLE (
 )
 LANGUAGE sql
 AS $$
-SELECT 
+SELECT DISTINCT
     title AS book_name,
     author,
     genre,
@@ -206,7 +219,7 @@ WHERE
     AND (p_min_price IS NULL OR price >= p_min_price)
     AND (p_max_price IS NULL OR price <= p_max_price);
 $$;
--- SELECT * FROM select_books();
+-- SELECT * FROM select_books(p_genre => 'Fantasy');
 
 -- Fetches all orders with details for a specific customer, including items ordered
 CREATE OR REPLACE FUNCTION get_orders_by_customer_with_items(p_customer_id INT)
@@ -272,38 +285,11 @@ $$
 $$;
 -- SELECT * FROM get_inventory_by_store(1);
 
--- Finds books in stock by author
-CREATE OR REPLACE FUNCTION find_books_by_author_in_stock(p_author TEXT)
-RETURNS TABLE (
-    book_id INT,
-    book_title TEXT,
-    author TEXT,
-    price DECIMAL(10, 2)
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        b.book_id,
-        b.title AS book_title,
-        b.author,
-        b.price
-    FROM 
-        books b
-    WHERE 
-        b.author = p_author
-    AND 
-        is_book_in_stock(b.book_id);  
-END;
-$$; 
--- SELECT * FROM find_books_by_author_in_stock('J.K. Rowling');
-
 -- Search for book
 CREATE OR REPLACE FUNCTION search_books_similar_to(p_search_query TEXT)
 RETURNS TABLE (
     book_id INT,
-    book_title TEXT,
+    title TEXT,
     author TEXT,
     genre TEXT,
     price DECIMAL(10, 2)
@@ -314,25 +300,24 @@ BEGIN
     RETURN QUERY
     SELECT 
         b.book_id,
-        b.title AS book_title,
+        b.title,
         b.author,
         b.genre,
         b.price
     FROM 
         books b
     WHERE 
-        LOWER(b.title) LIKE LOWER('%' || p_search_query || '%')
-    OR
-        LOWER(b.author) LIKE LOWER('%' || p_search_query || '%')
-    OR
-        LOWER(b.genre) LIKE LOWER('%' || p_search_query || '%')
-    AND 
+        (
+            LOWER(b.title) LIKE LOWER('%' || p_search_query || '%')
+            OR LOWER(b.author) LIKE LOWER('%' || p_search_query || '%')
+            OR LOWER(b.genre) LIKE LOWER('%' || p_search_query || '%')
+        )
+        AND 
         is_book_in_stock(b.book_id)
     ORDER BY 
         b.title;
 END;
 $$;
--- -- SELECT * FROM search_books_similar_to('Harry Potter');
 
 -- Retrieves the most popular books based on the total number of units sold
 CREATE OR REPLACE FUNCTION get_most_popular_books(p_limit INT)
@@ -429,4 +414,4 @@ GROUP BY
 ORDER BY 
     s.store_id;
 $$;
--- SELECT * FROM generate_sales_report('2024-01-01'::TIMESTAMP, '2024-12-31'::TIMESTAMP, ARRAY[1, 2, 3]);
+-- SELECT * FROM generate_sales_report('2024-01-01'::TIMESTAMP, '2024-12-31'::TIMESTAMP, ARRAY[1]);
